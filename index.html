@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joyeux Anniversaire Bintou !</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: radial-gradient(circle at center, #1e1e1e 0%, #0a0a0a 100%); color: #ffffff; min-height: 100vh; padding-bottom: 50px; overflow-x: hidden; perspective: 1000px; }
+        
+        #starsCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        #confettiContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99; overflow: hidden; }
+
+        .confetti { position: absolute; top: -50px; animation: fall linear forwards; will-change: transform; user-select: none; }
+        @keyframes fall { 
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } 
+        }
+
+        .music-control { position: fixed; top: 20px; right: 20px; z-index: 100; background: rgba(0,0,0,0.8); border: 1px solid rgba(212,175,55,0.4); border-radius: 30px; padding: 8px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.3s; }
+        .music-icon { width: 12px; height: 12px; background: #d4af37; border-radius: 50%; }
+        .music-icon.playing::after { content: ''; position: absolute; width: 20px; height: 20px; border: 1px solid #d4af37; border-radius: 50%; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+
+        .close-btn { position: absolute; top: 20px; left: 20px; z-index: 101; background: rgba(255,255,255,0.1); border: 1px solid #d4af37; color: #d4af37; padding: 5px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+        .close-btn:hover { background: #d4af37; color: #000; }
+
+        .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; transition: opacity 0.8s; }
+        .screen.hidden { display: none; opacity: 0; }
+        
+        .envelope-container { 
+            width: 100%; max-width: 400px; background: #151515; 
+            border: 1px solid rgba(212, 175, 55, 0.2); 
+            border-radius: 20px; padding: 40px 30px; text-align: center; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7); 
+            cursor: pointer; transition: all 0.5s ease; position: relative; z-index: 10; 
+            transform-origin: top;
+        }
+        .envelope-container.opening { animation: openEnvelope 0.8s forwards; }
+        @keyframes openEnvelope {
+            0% { transform: rotateX(0deg); }
+            50% { transform: rotateX(-20deg) scale(1.05); }
+            100% { transform: rotateX(-90deg) scale(0.9); opacity: 0; }
+        }
+        
+        .envelope-container:hover { border-color: #d4af37; }
+        .envelope-title { font-size: 2.2rem; color: #d4af37; margin-bottom: 10px; font-family: Georgia, serif; }
+        .wax-seal { width: 80px; height: 80px; background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%); border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #111; }
+
+        .luxury-frame { background: linear-gradient(135deg, #f5e29f, #b89332, #8c6a1c); padding: 10px; border-radius: 6px; max-width: 340px; width: 100%; margin: 20px auto; }
+        .passe-partout { background: #121212; padding: 20px; border-radius: 2px; }
+        .polaroid-img-container { width: 100%; aspect-ratio: 3/4; overflow: hidden; }
+        .polaroid-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .luxury-name { font-family: Georgia, serif; font-size: 1.5rem; color: #d4af37; text-align: center; margin-top: 15px; }
+
+        .vow-section { margin-top: 40px; text-align: center; width: 100%; max-width: 400px; }
+        .vow-title { font-family: Georgia, serif; font-size: 1.5rem; color: #d4af37; margin-bottom: 15px; }
+        .vow-card { width: 100%; height: 120px; perspective: 1000px; cursor: pointer; }
+        .vow-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s; transform-style: preserve-3d; }
+        .vow-card.flipped .vow-card-inner { transform: rotateY(180deg); }
+        .vow-front, .vow-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(212,175,55,0.2); }
+        .vow-front { background: #151515; color: #d4af37; font-style: italic; }
+        .vow-back { background: #d4af37; color: #111; transform: rotateY(180deg); font-weight: 500; font-size: 0.9rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop preload="auto" src="https://files.catbox.moe/8r5omn.mp3"></audio>
+    <canvas id="starsCanvas"></canvas>
+    <div id="confettiContainer"></div>
+
+    <div class="music-control" onclick="toggleMusic()">
+        <span class="music-icon" id="musicPulse"></span>
+        <span style="font-size: 0.75rem; color: #aaa;">Musique</span>
+    </div>
+
+    <div id="welcomeScreen" class="screen">
+        <div class="envelope-container" id="envelope" onclick="openCard()">
+            <h1 class="envelope-title">Chère Bintou</h1>
+            <p style="color:#888;">Une petite surprise t'attend</p>
+            <div class="wax-seal">❤️</div>
+            <p style="font-size: 1rem; color:#d4af37; margin-top:10px;">Clique pour ouvrir</p>
+        </div>
+    </div>
+
+    <div id="cardContent" class="screen hidden">
+        <button class="close-btn" onclick="closeCard()">Fermer</button>
+        <div class="luxury-frame">
+            <div class="passe-partout">
+                <div class="polaroid-img-container">
+                    <img src="https://files.catbox.moe/bw50j2.jpeg" alt="[Image de Bintou]">
+                </div>
+                <div class="luxury-name">Bintou ✨</div>
+            </div>
+        </div>
+
+        <div class="vow-section">
+            <h3 class="vow-title">Un petit mot pour toi</h3>
+            <div class="vow-card" onclick="this.classList.toggle('flipped')">
+                <div class="vow-card-inner">
+                    <div class="vow-front">Clique ici pour lire mon message</div>
+                    <div class="vow-back">"Que cette année t'apporte autant de bonheur que tu en donnes à ceux qui t'entourent. Joyeux anniversaire, Bintou !"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('confettiContainer');
+        const envelope = document.getElementById('envelope');
+        const colors = ['#f44336', '#e91e63', '#9c27b0', '#2196f3', '#00bcd4', '#4caf50', '#ffeb3b', '#ff9800'];
+        let confettiInterval;
+
+        const canvas = document.getElementById('starsCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, opacity: Math.random() });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            stars.forEach(s => {
+                ctx.globalAlpha = (Math.sin(Date.now() * 0.005 * s.size) + 1) / 2;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            const isCircle = Math.random() > 0.5;
+            confetti.style.borderRadius = isCircle ? '50%' : '0';
+            confetti.style.width = (Math.random() * 8 + 5) + 'px';
+            confetti.style.height = (Math.random() * 8 + 5) + 'px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            const duration = Math.random() * 3 + 4; 
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDuration = duration + 's';
+            container.appendChild(confetti);
+            setTimeout(() => confetti.remove(), duration * 1000);
+        }
+
+        function openCard() {
+            envelope.classList.add('opening');
+            
+            setTimeout(() => {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('cardContent').classList.remove('hidden');
+                const audio = document.getElementById('bgMusic');
+                audio.play().catch(e => console.log("Lecture auto bloquée"));
+                document.getElementById('musicPulse').classList.add('playing');
+                confettiInterval = setInterval(createConfetti, 100);
+            }, 800);
+        }
+
+        function closeCard() {
+            envelope.classList.remove('opening');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('cardContent').classList.add('hidden');
+            clearInterval(confettiInterval);
+            container.innerHTML = '';
+            const audio = document.getElementById('bgMusic');
+            audio.pause();
+            audio.currentTime = 0;
+            document.getElementById('musicPulse').classList.remove('playing');
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            if (audio.paused) { audio.play(); document.getElementById('musicPulse').classList.add('playing'); }
+            else { audio.pause(); document.getElementById('musicPulse').classList.remove('playing'); }
+        }
+
+        window.onresize = initStars;
+        initStars();
+        drawStars();
+    </script>
+</body>
+</html>
