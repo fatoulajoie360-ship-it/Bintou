@@ -25,7 +25,13 @@
             100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
         }
 
-        .close-btn { position: absolute; top: calc(15px + env(safe-area-inset-top)); left: 15px; z-index: 101; background: rgba(255,255,255,0.1); border: 1px solid #d4af37; color: #d4af37; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
+        .close-btn { 
+            position: absolute; top: calc(15px + env(safe-area-inset-top)); left: 15px; z-index: 101; 
+            width: 40px; height: 40px; border-radius: 50%; 
+            background: rgba(255,255,255,0.1); border: 1px solid #d4af37; 
+            color: #d4af37; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; line-height: 1; font-weight: bold; padding: 0;
+        }
 
         .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 15px; padding-top: env(safe-area-inset-top); transition: opacity 0.8s; }
         .screen.hidden { display: none; opacity: 0; }
@@ -80,7 +86,7 @@
     </div>
 
     <div id="cardContent" class="screen hidden">
-        <button class="close-btn" onclick="closeCard()">Fermer</button>
+        <button class="close-btn" onclick="closeCard()">✕</button>
         <div class="luxury-frame">
             <div class="passe-partout">
                 <div class="polaroid-img-container">
@@ -172,7 +178,6 @@
                 document.getElementById('cardContent').classList.remove('hidden');
                 const audio = document.getElementById('bgMusic');
                 audio.play().catch(e => console.log("Audio bloqué"));
-                // Fréquence augmentée : apparition toutes les 80ms
                 confettiInterval = setInterval(createGoldDust, 80);
             }, 800);
         }
