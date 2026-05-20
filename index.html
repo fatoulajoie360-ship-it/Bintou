@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr" style="background-color: #0a0a0a;">
 <head>
@@ -5,36 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Joyeux Anniversaire Bintou !</title>
     <style>
-        /* Force le fond sur tout l'affichage root */
-        html, body { 
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: #0a0a0a;
-            overflow-x: hidden;
-        }
-
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            color: #ffffff; 
-            background: radial-gradient(circle at center, #1e1e1e 0%, #0a0a0a 100%); 
-            min-height: 100vh;
-            padding-bottom: 50px; 
-            perspective: 1000px; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0a0a0a; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff; background: radial-gradient(circle at center, #1e1e1e 0%, #0a0a0a 100%); min-height: 100vh; padding-bottom: 50px; perspective: 1000px; -webkit-tap-highlight-color: transparent; }
         * { box-sizing: border-box; touch-action: manipulation; }
         
         #starsCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
         #confettiContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99; overflow: hidden; }
 
-        .confetti { position: absolute; top: -50px; animation: fall linear forwards; will-change: transform; user-select: none; }
+        .gold-dust { position: absolute; top: -50px; background: gold; border-radius: 50%; animation: fall linear forwards; will-change: transform; box-shadow: 0 0 5px gold; }
+        .explosion-particle { position: absolute; top: 50%; left: 50%; border-radius: 50%; pointer-events: none; will-change: transform; background: gold; box-shadow: 0 0 8px gold; }
+        
         @keyframes fall { 
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } 
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } 
+        }
+        @keyframes explode { 
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
         }
 
         .close-btn { position: absolute; top: calc(15px + env(safe-area-inset-top)); left: 15px; z-index: 101; background: rgba(255,255,255,0.1); border: 1px solid #d4af37; color: #d4af37; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
@@ -42,14 +30,9 @@
         .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 15px; padding-top: env(safe-area-inset-top); transition: opacity 0.8s; }
         .screen.hidden { display: none; opacity: 0; }
         
-        .envelope-container { 
-            width: 90%; max-width: 350px; background: #151515; 
-            border: 1px solid rgba(212, 175, 55, 0.2); 
-            border-radius: 20px; padding: 30px 20px; text-align: center; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7); 
-            cursor: pointer; transition: all 0.5s ease; position: relative; z-index: 10; 
-            transform-origin: top;
-        }
+        @keyframes pulse-envelope { 0% { transform: scale(1); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); } 50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(212, 175, 55, 0.6); } 100% { transform: scale(1); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); } }
+        
+        .envelope-container { width: 90%; max-width: 350px; background: #151515; border: 2px solid #d4af37; border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.5s ease; position: relative; z-index: 10; transform-origin: top; animation: pulse-envelope 3s infinite; }
         .envelope-container.opening { animation: openEnvelope 0.8s forwards; }
         @keyframes openEnvelope {
             0% { transform: rotateX(0deg); }
@@ -60,20 +43,25 @@
         .envelope-title { font-size: 1.8rem; color: #d4af37; margin-bottom: 10px; font-family: Georgia, serif; }
         .wax-seal { width: 60px; height: 60px; background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%); border-radius: 50%; margin: 15px auto; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #111; }
 
-        .luxury-frame { background: linear-gradient(135deg, #f5e29f, #b89332, #8c6a1c); padding: 8px; border-radius: 8px; max-width: 300px; width: 100%; margin: 10px auto; }
+        @keyframes glow-frame { 0% { box-shadow: 0 0 5px #d4af37; } 50% { box-shadow: 0 0 20px #d4af37; } 100% { box-shadow: 0 0 5px #d4af37; } }
+        .luxury-frame { background: linear-gradient(135deg, #f5e29f, #b89332, #8c6a1c); padding: 8px; border-radius: 8px; max-width: 300px; width: 100%; margin: 10px auto; animation: glow-frame 2s infinite; }
         .passe-partout { background: #121212; padding: 15px; border-radius: 4px; }
         .polaroid-img-container { width: 100%; aspect-ratio: 3/4; overflow: hidden; }
         .polaroid-img-container img { width: 100%; height: 100%; object-fit: cover; }
         .luxury-name { font-family: Georgia, serif; font-size: 1.3rem; color: #d4af37; text-align: center; margin-top: 10px; }
 
         .vow-section { margin-top: 20px; text-align: center; width: 100%; max-width: 320px; }
-        .vow-title { font-family: Georgia, serif; font-size: 1.3rem; color: #d4af37; margin-bottom: 10px; }
-        .vow-card { width: 100%; height: 140px; perspective: 1000px; cursor: pointer; }
+        .vow-title { font-family: Georgia, serif; font-size: 1.3rem; color: #d4af37; margin-bottom: 15px; }
+        
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 5px #d4af37; } 50% { transform: scale(1.05); box-shadow: 0 0 20px #d4af37; } 100% { transform: scale(1); } }
+        
+        .vow-card { width: 100%; height: 140px; perspective: 1000px; cursor: pointer; border-radius: 12px; }
+        .vow-card.active { animation: pulse 2s infinite; }
         .vow-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s; transform-style: preserve-3d; }
         .vow-card.flipped .vow-card-inner { transform: rotateY(180deg); }
-        .vow-front, .vow-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(212,175,55,0.2); }
-        .vow-front { background: #151515; color: #d4af37; font-style: italic; }
-        .vow-back { background: #d4af37; color: #111; transform: rotateY(180deg); font-weight: 500; font-size: 0.9rem; line-height: 1.4; }
+        .vow-front, .vow-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: center; border: 2px solid #d4af37; }
+        .vow-front { background: #151515; color: #d4af37; font-weight: bold; font-style: italic; font-size: 1.1rem; }
+        .vow-back { background: #d4af37; color: #111; transform: rotateY(180deg); font-weight: 600; font-size: 1rem; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -104,9 +92,9 @@
 
         <div class="vow-section">
             <h3 class="vow-title">Un petit mot pour toi</h3>
-            <div class="vow-card" onclick="this.classList.toggle('flipped')">
+            <div class="vow-card active" id="vowCard" onclick="toggleVow()">
                 <div class="vow-card-inner">
-                    <div class="vow-front">Clique ici pour lire mon message</div>
+                    <div class="vow-front">Clique ici pour lire mon message ✨</div>
                     <div class="vow-back">"Que cette année t'apporte autant de bonheur que tu en donnes à ceux qui t'entourent. Joyeux anniversaire, Bintou !"</div>
                 </div>
             </div>
@@ -116,7 +104,6 @@
     <script>
         const container = document.getElementById('confettiContainer');
         const envelope = document.getElementById('envelope');
-        const colors = ['#f44336', '#e91e63', '#9c27b0', '#2196f3', '#00bcd4', '#4caf50', '#ffeb3b', '#ff9800'];
         let confettiInterval;
 
         const canvas = document.getElementById('starsCanvas');
@@ -144,29 +131,49 @@
             requestAnimationFrame(drawStars);
         }
 
-        function createConfetti() {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            const isCircle = Math.random() > 0.5;
-            confetti.style.borderRadius = isCircle ? '50%' : '0';
-            confetti.style.width = (Math.random() * 8 + 5) + 'px';
-            confetti.style.height = (Math.random() * 8 + 5) + 'px';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            const duration = Math.random() * 3 + 4; 
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.animationDuration = duration + 's';
-            container.appendChild(confetti);
-            setTimeout(() => confetti.remove(), duration * 1000);
+        function toggleVow() {
+            const card = document.getElementById('vowCard');
+            card.classList.toggle('flipped');
+            card.classList.toggle('active');
+        }
+
+        function triggerGoldExplosion() {
+            for (let i = 0; i < 120; i++) {
+                const p = document.createElement('div');
+                p.className = 'explosion-particle';
+                const size = Math.random() * 4 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.setProperty('--dx', (Math.random() - 0.5) * 800 + 'px');
+                p.style.setProperty('--dy', (Math.random() - 0.5) * 800 + 'px');
+                p.style.animation = 'explode 2s ease-out forwards';
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 2000);
+            }
+        }
+
+        function createGoldDust() {
+            const dust = document.createElement('div');
+            dust.className = 'gold-dust';
+            const size = Math.random() * 4 + 2;
+            dust.style.width = size + 'px';
+            dust.style.height = size + 'px';
+            dust.style.left = Math.random() * 100 + 'vw';
+            dust.style.animationDuration = (Math.random() * 4 + 3) + 's';
+            container.appendChild(dust);
+            setTimeout(() => dust.remove(), 7000);
         }
 
         function openCard() {
+            triggerGoldExplosion();
             envelope.classList.add('opening');
             setTimeout(() => {
                 document.getElementById('welcomeScreen').classList.add('hidden');
                 document.getElementById('cardContent').classList.remove('hidden');
                 const audio = document.getElementById('bgMusic');
-                audio.play().catch(e => console.log("Audio bloqué par le navigateur"));
-                confettiInterval = setInterval(createConfetti, 100);
+                audio.play().catch(e => console.log("Audio bloqué"));
+                // Fréquence augmentée : apparition toutes les 80ms
+                confettiInterval = setInterval(createGoldDust, 80);
             }, 800);
         }
 
